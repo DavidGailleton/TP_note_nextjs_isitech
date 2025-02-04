@@ -34,6 +34,13 @@ const users = [
         "name": "Balazs Orban",
         "role": "teacher",
     },
+    {
+        "id": "795e7533-de0c-4e4d-9376-820a78104c29",
+        "email": "jean.dupont@test.com",
+        "password": "Test@1234!",
+        "name": "Jean DUPONT",
+        "role": "admin",
+    },
 ]
 
 export {users};
