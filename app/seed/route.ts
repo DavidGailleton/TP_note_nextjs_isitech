@@ -1,20 +1,21 @@
 import postgres from 'postgres';
 import bcrypt from 'bcrypt';
 import {users} from "../lib/placeholder-data";
+import * as console from "node:console";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 async function seedUser () {
     await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
+    // await sql`
+    //     CREATE TYPE IF NOT EXISTS roles as ENUM('teacher', 'student');`;
     await sql`
-        CREATE TYPE if NOT EXTISTS roles as ENUM('teacher', 'student');`;
-    await sql`
-        CREATE TABLE if NOT EXISTS User (
+        CREATE TABLE if NOT EXISTS Users (
             id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
             email VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
             name VARCHAR(50) NOT NULL,
-            role roles,
+            role roles NOT NULL,
             createdAt TIMESTAMP NOT NULL DEFAULT NOW()
     );`;
     const insertedUsers = await Promise.all(
@@ -69,4 +70,19 @@ async function seedProgress () {
         evaluation VARCHAR(255),
         comments TEXT
     )`
+}
+
+export async function GET() {
+    try {
+        const result = await sql.begin((sql) => [
+            seedUser(),
+            seedCourse(),
+            seedEnrollment(),
+            seedProgress(),
+        ]);
+
+        return Response.json({ message: 'Database seeded successfully' });
+    } catch (error) {
+        return Response.json({ error }, { status: 500 });
+    }
 }
