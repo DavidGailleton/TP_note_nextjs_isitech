@@ -21,7 +21,7 @@ export async function fetchCourses():Promise<coursesTable[]>{
                 course.title,
                 course.description,
                 course.instrument,
-                users.name,
+                users.name AS teacherName,
                 course.level,
                 course.schedule,
                 course.capacity
