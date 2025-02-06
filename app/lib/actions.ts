@@ -66,3 +66,47 @@ export async function EditCourse(courseId: string, formData: FormData) {
     }
     redirect('/teacher/courses');
 }
+
+export async function AddCourse(formData: FormData) {
+    try {
+        const scheduleDate = new Date(formData.get('schedule') as string);
+        const parisOffset = 1;
+        scheduleDate.setHours(scheduleDate.getHours() + parisOffset);
+
+        const updateData = {
+            title: formData.get('title'),
+            description: formData.get('description'),
+            instrument: formData.get('instrument'),
+            teacherId: formData.get('teacherId'),
+            level: formData.get('level'),
+            schedule: scheduleDate,
+            capacity: Number(formData.get('capacity'))
+        };
+        await sql`
+            INSERT INTO course(
+                title,
+                description,
+                instrument,
+                teacherId,
+                level,
+                schedule,
+                capacity
+                ) VALUES (
+                          ${updateData.title},
+                          ${updateData.description},
+                          ${updateData.instrument},
+                          ${updateData.teacherId},
+                          ${updateData.level},
+                          ${updateData.schedule},
+                          ${updateData.capacity}
+                          
+                         )
+            `;
+
+        revalidatePath('/teacher/courses');
+    } catch (error) {
+        console.error('Course insert failed:', error);
+        throw new Error('Course insert failed');
+    }
+    redirect('/teacher/courses');
+}
