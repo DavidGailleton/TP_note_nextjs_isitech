@@ -31,7 +31,6 @@ export const { auth, signIn, signOut } = NextAuth({
                         password: z.string().min(6),
                     })
                     .safeParse(credentials);
-
                 if (parsedCredentials.success) {
                     const { email, password } = parsedCredentials.data;
                     const user = await getUser(email);
@@ -43,10 +42,6 @@ export const { auth, signIn, signOut } = NextAuth({
 
                     if (passwordsMatch) return user;
                 }
-
-                console.log("Invalid credentials");
-                return null;
-
                 return null;
             },
         }),
