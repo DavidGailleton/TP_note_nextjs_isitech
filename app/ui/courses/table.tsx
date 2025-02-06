@@ -1,4 +1,5 @@
 import {fetchCourses} from "@/app/lib/data";
+import Link from "next/link";
 
 export default async function Table() {
     const courses = await fetchCourses();
@@ -20,16 +21,16 @@ export default async function Table() {
             </thead>
             <tbody>
             {courses?.map((course) => (
-                <tr key={course.id}>
+                <tr key={course.id} className="">
                     <td>{course.title}</td>
-                    <td>{course.description}</td>
+                    <td>{course.description.slice(0, 30)+" ..."}</td>
                     <td>{course.instrument}</td>
-                    <td>{course.teacherName}</td>
+                    <td>{course.teachername}</td>
                     <td>{course.level}</td>
-                    <td>{course.schedule}</td>
+                    <td>{course.schedule.getFullYear()+"/"+course.schedule.getMonth()}</td>
                     <td>{course.capacity}</td>
                     <td><button>Details</button></td>
-                    <td><button>Edit</button></td>
+                    <td><Link href={`/teacher/courses/${course.id}/edit`}>Edit</Link></td>
                     <td><button>Delete</button></td>
                 </tr>
             ))}

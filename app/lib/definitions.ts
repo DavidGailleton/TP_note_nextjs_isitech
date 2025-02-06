@@ -11,9 +11,16 @@ export type courseTable = {
     title: string,
     description: string,
     instrument: string,
-    teacherId: string,
-    teacherName: string,
+    teacherid: string,
+    teachername: string,
     level: string,
-    schedule: number,
+    schedule: Date,
     capacity: number,
+}
+
+export type user = {
+    id: string,
+    email: string,
+    name: string,
+    role: string,
 }
