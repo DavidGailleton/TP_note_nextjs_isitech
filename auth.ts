@@ -22,6 +22,12 @@ async function getUser(email: string): Promise<User | undefined> {
 
 export const { auth, signIn, signOut } = NextAuth({
     ...authConfig,
+    session: {
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60,
+        updateAge: 24 * 60 * 60,
+    },
+
     callbacks: {
         async session({ session, token }) {
             if (token && session.user) {

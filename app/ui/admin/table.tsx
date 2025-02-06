@@ -1,6 +1,6 @@
 import { fetchUsers } from "@/app/lib/data";
 
-export default async function tableUsers() {
+export default async function TableUsers() {
     const users = await fetchUsers();
     return (
         <div className="mt-6 flow-root">
@@ -39,6 +39,9 @@ export default async function tableUsers() {
                                 </td>
                                 <td className="whitespace-nowrap px-3 py-3">
                                     {user.email}
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-3">
+                                    {user.role}
                                 </td>
 
                                 <td className="whitespace-nowrap py-3 pl-6 pr-3">

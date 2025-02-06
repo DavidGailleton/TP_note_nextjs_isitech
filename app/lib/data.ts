@@ -14,6 +14,14 @@ export async function fetchRoles() {
         throw new Error("Failed to fetch revenue data.");
     }
 }
+export async function fetchUsers() {
+    try {
+        const users = await sql`select * from Users;`;
+        return users;
+    } catch (error) {
+        console.log("erreur database : ", error);
+    }
+}
 export async function fetchCourses(): Promise<courseTable[]> {
     try {
         const courses = await sql<courseTable[]>`
@@ -76,13 +84,5 @@ export async function fetchTeachers(): Promise<user[]> {
         WHERE role = 'teacher';`;
     } catch (error) {
         throw new Error("Teachers fetch failed");
-    }
-}
-export async function fetchUsers() {
-    try {
-        const users = await sql`select * from Users;`;
-        return users;
-    } catch (error) {
-        console.log("erreur database : ", error);
     }
 }
