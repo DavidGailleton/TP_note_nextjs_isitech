@@ -1,8 +1,12 @@
 import {fetchCourses} from "@/app/lib/data";
 import Link from "next/link";
+import {Button} from "@/app/ui/components/button";
+import {DeleteCourse} from "@/app/lib/actions";
+import {MouseEventHandler} from "react";
 
 export default async function Table() {
     const courses = await fetchCourses();
+
     return (
         <table>
             <thead>
@@ -14,9 +18,9 @@ export default async function Table() {
                 <th>Level</th>
                 <th>Schedule</th>
                 <th>Capacity</th>
-                <th>Details</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th></th>
+                <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -27,11 +31,13 @@ export default async function Table() {
                     <td>{course.instrument}</td>
                     <td>{course.teachername}</td>
                     <td>{course.level}</td>
-                    <td>{course.schedule.getFullYear()+"/"+course.schedule.getMonth()}</td>
+                    <td>{course.schedule.getFullYear()+"/"+course.schedule.getMonth()+"/"+course.schedule.getDay()+" - "+course.schedule.getHours()+":"+course.schedule.getMinutes()}</td>
                     <td>{course.capacity}</td>
-                    <td><button>Details</button></td>
                     <td><Link href={`/teacher/courses/${course.id}/edit`}>Edit</Link></td>
-                    <td><button>Delete</button></td>
+                    <td><form action={async () => {
+                        'use server'
+                        await DeleteCourse(course.id);
+                    }}><Button type="submit" className="bg-red-600 hover:bg-red-900">Delete</Button></form></td>
                 </tr>
             ))}
             </tbody>

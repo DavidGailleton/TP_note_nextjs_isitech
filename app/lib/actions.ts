@@ -110,3 +110,17 @@ export async function AddCourse(formData: FormData) {
     }
     redirect('/teacher/courses');
 }
+
+export async function DeleteCourse(courseId: string) {
+    try {
+        await sql`
+        DELETE FROM course
+        WHERE id = ${courseId};`;
+
+        revalidatePath('/teacher/courses');
+    } catch (error) {
+        console.log("Failed to delete course : ", error);
+        throw new Error("Failed to delete course");
+    }
+    redirect('/teacher/courses');
+}
