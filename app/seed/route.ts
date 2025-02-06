@@ -38,7 +38,7 @@ async function seedCourse () {
             instrument VARCHAR(255),
             teacherId UUID NOT NULL,
             level VARCHAR(255),
-            schedule TEXT,
+            schedule TIMESTAMP NOT NULL,
             capacity SMALLINT,
             FOREIGN KEY (teacherId) REFERENCES Users(id) ON DELETE CASCADE
         );`;
