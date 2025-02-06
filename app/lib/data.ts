@@ -12,3 +12,12 @@ export async function fetchRoles() {
         throw new Error("Failed to fetch revenue data.");
     }
 }
+
+export async function fetchUsers() {
+    try {
+        const users = await sql`select * from Users;`;
+        return users;
+    } catch (error) {
+        console.log("erreur database : ", error);
+    }
+}
