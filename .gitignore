@@ -120,3 +120,4 @@ fabric.properties
 
 #pnpm
 pnpm-lock.yaml
+package-lock.json
