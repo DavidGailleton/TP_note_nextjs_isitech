@@ -1,4 +1,5 @@
 import { fetchUsers } from "@/app/lib/data";
+import { UpdateUser } from "../components/button";
 
 export default async function TableUsers() {
     const users = await fetchUsers();
@@ -46,8 +47,8 @@ export default async function TableUsers() {
 
                                 <td className="whitespace-nowrap py-3 pl-6 pr-3">
                                     <div className="flex justify-end gap-3">
-                                        {/* <UpdateInvoice id={invoice.id} />
-                                            <DeleteInvoice id={invoice.id} /> */}
+                                        <UpdateUser id={user.id} />
+                                        {/* <DeleteInvoice id={invoice.id} />  */}
                                     </div>
                                 </td>
                             </tr>

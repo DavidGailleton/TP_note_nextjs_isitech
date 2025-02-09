@@ -1,17 +1,38 @@
 "use server";
 import postgres from "postgres";
-import { courseTable, user } from "@/app/lib/definitions";
+import { courseTable, RegisterRole, User, user } from "@/app/lib/definitions";
 import * as console from "node:console";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-export async function fetchRoles() {
+// In data.ts
+export async function fetchRoles(): Promise<RegisterRole[]> {
     try {
-        const roles = await sql`SELECT distinct role FROM Users;`;
+        const rolesResult = await sql`SELECT distinct role FROM Users;`;
+        // Transform the raw database result into the expected RegisterRole format
+        const roles: RegisterRole[] = [
+            {
+                roles: rolesResult.map((row) => ({ role: row.role })),
+            },
+        ];
         return roles;
     } catch (error) {
         console.error("Database Error:", error);
-        throw new Error("Failed to fetch revenue data.");
+        throw new Error("Failed to fetch roles data.");
+    }
+}
+
+export async function fetchUserById(id: string): Promise<User | undefined> {
+    try {
+        const users = await sql<User[]>`
+            SELECT id, name, email, password, role 
+            FROM Users 
+            WHERE id = ${id};
+        `;
+        return users[0];
+    } catch (error) {
+        console.log("erreur database : ", error);
+        return undefined;
     }
 }
 export async function fetchUsers() {
@@ -22,6 +43,7 @@ export async function fetchUsers() {
         console.log("erreur database : ", error);
     }
 }
+
 export async function fetchCourses(): Promise<courseTable[]> {
     try {
         const courses = await sql<courseTable[]>`

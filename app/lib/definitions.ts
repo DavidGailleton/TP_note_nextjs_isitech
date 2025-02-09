@@ -18,23 +18,23 @@ export type RegisterRole = {
 };
 
 export type courseTable = {
-    id: string,
-    title: string,
-    description: string,
-    instrument: string,
-    teacherid: string,
-    teachername: string,
-    level: string,
-    schedule: Date,
-    capacity: number,
-}
+    id: string;
+    title: string;
+    description: string;
+    instrument: string;
+    teacherid: string;
+    teachername: string;
+    level: string;
+    schedule: Date;
+    capacity: number;
+};
 
 export type user = {
-    id: string,
-    email: string,
-    name: string,
-    role: string,
-}
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+};
 import "next-auth";
 import "next-auth/jwt";
 
