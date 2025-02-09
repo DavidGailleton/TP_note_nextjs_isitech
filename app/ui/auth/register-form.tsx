@@ -7,19 +7,28 @@ import {
     KeyIcon,
     UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import { RegisterRole, Role } from "@/app/lib/definitions";
+import { Role } from "@/app/lib/definitions";
 import { Button } from "@/app/ui/components/button";
 import { register } from "@/app/lib/actions";
-import { useActionState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useFormState } from "react-dom";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default function RegisterForm({ roles }: RegisterRole[]) {
-    const [errorMessage, formAction, isPending] = useActionState(
-        register,
-        undefined
+export default function RegisterForm({ roles }: { roles: Role[] }) {
+    const router = useRouter();
+    const initialState: string | { message: string } = "";
+
+    const [state, formAction] = useFormState(
+        (prevState: string | { message: string }, formData: FormData) =>
+            register(prevState, formData),
+        initialState
     );
 
-    const searchParams = useSearchParams();
+    useEffect(() => {
+        if (typeof state === "object" && state.message === "success") {
+            router.push("/admin/users");
+        }
+    }, [state, router]);
 
     return (
         <form action={formAction} className="space-y-3">
@@ -121,24 +130,26 @@ export default function RegisterForm({ roles }: RegisterRole[]) {
                             <option value="" disabled>
                                 Sélectionner un rôle
                             </option>
-                            {roles.map((role: Role) => (
-                                <option key={role.role} value={role.role}>
-                                    {role.role}
-                                </option>
-                            ))}
+                            {Array.isArray(roles) &&
+                                roles.map((role: Role) => (
+                                    <option key={role.role} value={role.role}>
+                                        {role.role}
+                                    </option>
+                                ))}
                         </select>
                     </div>
-                    <Button className="mt-4 w-full" aria-disabled={isPending}>
-                        Inscription{" "}
+                    <Button className="mt-4 w-full">
+                        Inscription
                         <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
                     </Button>
-
                     <div className="flex h-8 items-end space-x-1">
-                        {errorMessage && (
+                        {state && (
                             <>
                                 <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
                                 <p className="text-sm text-red-500">
-                                    {errorMessage}
+                                    {typeof state === "string"
+                                        ? state
+                                        : state.message}
                                 </p>
                             </>
                         )}

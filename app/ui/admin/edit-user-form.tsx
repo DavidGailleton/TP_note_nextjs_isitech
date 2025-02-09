@@ -1,6 +1,6 @@
 "use client";
-import { useActionState } from "react";
-import { updateUserById, State } from "@/app/lib/actions";
+import { useActionState, useEffect } from "react";
+import { updateUserById, type State } from "@/app/lib/actions";
 import { User, Role, RegisterRole } from "@/app/lib/definitions";
 import {
     AtSymbolIcon,
@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "@/app/ui/components/button";
+import { useRouter } from "next/navigation";
 
 export default function EditUserForm({
     user,
@@ -18,9 +19,16 @@ export default function EditUserForm({
     user: User;
     roles: RegisterRole[];
 }) {
+    const router = useRouter();
+
     const updateUserWithId = updateUserById.bind(null, user.id);
     const initialState: State = { message: null, errors: {} };
     const [state, formAction] = useActionState(updateUserWithId, initialState);
+    useEffect(() => {
+        if (state?.message === "success") {
+            router.push("/admin/users");
+        }
+    }, [state, router]);
 
     return (
         <form action={formAction}>

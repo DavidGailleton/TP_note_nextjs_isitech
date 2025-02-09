@@ -1,21 +1,14 @@
 "use server";
 import postgres from "postgres";
-import { courseTable, RegisterRole, User, user } from "@/app/lib/definitions";
+import { courseTable, Role, User, user } from "@/app/lib/definitions";
 import * as console from "node:console";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-// In data.ts
-export async function fetchRoles(): Promise<RegisterRole[]> {
+export async function fetchRoles(): Promise<Role[]> {
     try {
         const rolesResult = await sql`SELECT distinct role FROM Users;`;
-        // Transform the raw database result into the expected RegisterRole format
-        const roles: RegisterRole[] = [
-            {
-                roles: rolesResult.map((row) => ({ role: row.role })),
-            },
-        ];
-        return roles;
+        return rolesResult.map((row) => ({ role: row.role }));
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch roles data.");
@@ -41,6 +34,46 @@ export async function fetchUsers() {
         return users;
     } catch (error) {
         console.log("erreur database : ", error);
+    }
+}
+const ITEMS_PER_PAGE = 6;
+export async function fetchFilteredUsers(query: string, currentPage: number) {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+    try {
+        const users = await sql<User[]>`
+      SELECT
+        *
+      FROM users
+      WHERE
+        users.name ILIKE ${`%${query}%`} OR
+        users.email ILIKE ${`%${query}%`} OR
+        users.role::text ILIKE ${`%${query}%`}
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+        return users;
+    } catch (error) {
+        console.error("Database Error:", error);
+        throw new Error("Failed to fetch users.");
+    }
+}
+
+export async function fetchUsersPages(query: string) {
+    try {
+        const data = await sql`
+        SELECT COUNT(*)
+        FROM users
+        WHERE
+          name ILIKE ${`%${query}%`} OR
+          email ILIKE ${`%${query}%`} OR
+          role::text ILIKE ${`%${query}%`}
+        `;
+
+        const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
+        return totalPages;
+    } catch (error) {
+        console.error("Database Error:", error);
+        throw new Error("Failed to fetch total number of users.");
     }
 }
 

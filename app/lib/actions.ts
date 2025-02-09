@@ -49,18 +49,10 @@ const UpdateUserSchema = z
         }
     );
 
-export type State = {
-    errors?: {
-        userId?: string[];
-        email?: string[];
-        name?: string[];
-    };
-    message?: string | null;
-};
 export async function register(
-    prevState: string | undefined,
+    prevState: string | { message: string },
     formData: FormData
-) {
+): Promise<string | { message: string }> {
     try {
         const validatedFields = RegisterSchema.safeParse({
             name: formData.get("name"),
@@ -88,8 +80,10 @@ export async function register(
 
         await sql`
                 INSERT INTO users (name, email, password, role)
-                VALUES (${name},${email}, ${hashedPassword}, ${role})
+                VALUES (${name}, ${email}, ${hashedPassword}, ${role})
             `;
+
+        return { message: "success" };
     } catch (error) {
         if (error instanceof AuthError) {
             return "Erreur lors de la connexion";
@@ -122,7 +116,7 @@ export async function updateUserById(
     userId: string,
     prevState: State,
     formData: FormData
-) {
+): Promise<State> {
     try {
         const validatedFields = UpdateUserSchema.safeParse({
             name: formData.get("name"),
@@ -132,7 +126,9 @@ export async function updateUserById(
         });
 
         if (!validatedFields.success) {
-            return validatedFields.error.errors[0].message;
+            return {
+                message: validatedFields.error.errors[0].message,
+            };
         }
 
         const { name, password, role } = validatedFields.data;
@@ -156,11 +152,16 @@ export async function updateUserById(
         }
 
         revalidatePath("/admin/users");
-        redirect("/admin/users");
+        return { message: "success" };
     } catch (error) {
         console.error("Update user error:", error);
         return { message: "Erreur lors de la mise à jour de l'utilisateur" };
     }
+}
+
+export async function deleteUserById(id: string) {
+    await sql`DELETE FROM users WHERE id = ${id}`;
+    revalidatePath("/admin/users");
 }
 
 export async function EditCourse(courseId: string, formData: FormData) {

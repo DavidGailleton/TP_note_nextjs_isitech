@@ -1,8 +1,14 @@
-import { fetchUsers } from "@/app/lib/data";
-import { UpdateUser } from "../components/button";
+import { fetchFilteredUsers } from "@/app/lib/data";
+import { UpdateUser, DeleteUser } from "../components/button";
 
-export default async function TableUsers() {
-    const users = await fetchUsers();
+export default async function TableUsers({
+    query,
+    currentPage,
+}: {
+    query: string;
+    currentPage: number;
+}) {
+    const users = await fetchFilteredUsers(query, currentPage);
     return (
         <div className="mt-6 flow-root">
             <div className="inline-block min-w-full align-middle">
@@ -48,7 +54,7 @@ export default async function TableUsers() {
                                 <td className="whitespace-nowrap py-3 pl-6 pr-3">
                                     <div className="flex justify-end gap-3">
                                         <UpdateUser id={user.id} />
-                                        {/* <DeleteInvoice id={invoice.id} />  */}
+                                        <DeleteUser id={user.id} />
                                     </div>
                                 </td>
                             </tr>
