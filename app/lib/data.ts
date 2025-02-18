@@ -1,6 +1,6 @@
 "use server";
 import postgres from "postgres";
-import { courseTable, Role, User, user } from "@/app/lib/definitions";
+import {courseTable, Progress, Role, Student, User, user} from "@/app/lib/definitions";
 import * as console from "node:console";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
@@ -139,5 +139,118 @@ export async function fetchTeachers(): Promise<user[]> {
         WHERE role = 'teacher';`;
     } catch (error) {
         throw new Error("Teachers fetch failed");
+    }
+}
+
+export async function fetchStudents(): Promise<Student[]> {
+    try {
+        return await sql<Student[]>`
+        SELECT 
+            users.id,
+            users.name,
+            users.email,
+            users.role
+        FROM users
+        WHERE role = 'student';`;
+    } catch (error) {
+        console.error("Students fetch failed:", error);
+        throw new Error("Students fetch failed");
+    }
+}
+
+export async function fetchProgress(): Promise<Progress[]> {
+    try {
+        const progress = await sql<Progress[]>`
+            SELECT 
+                progress.id,
+                progress.studentId,
+                progress.courseId,
+                progress.date,
+                progress.evaluation,
+                progress.comments,
+                student.name as studentName,
+                course.title as courseName
+            FROM progress
+            JOIN users as student ON student.id = progress.studentId
+            JOIN course ON course.id = progress.courseId
+            ORDER BY progress.date DESC;`;
+
+        console.log(`Found ${progress.length} evaluations`);
+        console.log(progress);
+        return progress;
+    } catch (error) {
+        console.error("Progress fetch failed:", error);
+        throw new Error("Progress fetch failed");
+    }
+}
+
+export async function fetchStudentsByCourse(courseId: string): Promise<Student[]> {
+    try {
+        const students = await sql<Student[]>`
+            SELECT 
+                users.id,
+                users.name,
+                users.email,
+                users.role
+            FROM users
+            JOIN enrollment ON enrollment.studentId = users.id
+            WHERE enrollment.courseId = ${courseId}
+            AND users.role = 'student';`;
+
+        return students;
+    } catch (error) {
+        console.error("Students by course fetch failed:", error);
+        throw new Error("Students by course fetch failed");
+    }
+}
+
+export async function fetchProgressById(id: string): Promise<Progress | undefined> {
+    try {
+        const progress = await sql<Progress[]>`
+      SELECT 
+        progress.id,
+        progress.studentId,
+        student.name as studentName,
+        progress.courseId,
+        course.title as courseName,
+        progress.date,
+        progress.evaluation,
+        progress.comments
+      FROM progress
+      JOIN users as student ON student.id = progress.studentId
+      JOIN course ON course.id = progress.courseId
+      WHERE progress.id = ${id};
+    `;
+
+        return progress[0];
+    } catch (error) {
+        console.error("Progress fetch failed:", error);
+        return undefined;
+    }
+}
+
+export async function fetchProgressByStudent(studentId: string): Promise<Progress[]> {
+    try {
+        const progress = await sql<Progress[]>`
+      SELECT 
+        progress.id,
+        progress.studentId,
+        progress.courseId,
+        course.title as courseName,
+        progress.date,
+        progress.evaluation,
+        progress.comments,
+        teacher.name as teacherName
+      FROM progress
+      JOIN course ON course.id = progress.courseId
+      JOIN users as teacher ON teacher.id = course.teacherId
+      WHERE progress.studentId = ${studentId}
+      ORDER BY progress.date DESC;
+    `;
+
+        return progress;
+    } catch (error) {
+        console.error("Student progress fetch failed:", error);
+        throw new Error("Student progress fetch failed");
     }
 }

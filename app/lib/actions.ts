@@ -257,3 +257,86 @@ export async function DeleteCourse(courseId: string) {
     }
     redirect("/teacher/courses");
 }
+
+export type ProgressState = {
+    message: string | null;
+    errors?: Record<string, string[]>;
+};
+
+export async function submitEvaluation(
+    prevState: ProgressState,
+    formData: FormData
+): Promise<ProgressState> {
+    try {
+        const studentId = formData.get('studentId') as string;
+        const courseId = formData.get('courseId') as string;
+        const evaluation = formData.get('evaluation') as string;
+        const comments = formData.get('comments') as string;
+
+        if (!studentId || !courseId || !evaluation) {
+            return {
+                message: 'Les champs obligatoires doivent être remplis',
+                errors: {
+                    studentId: !studentId ? ['Étudiant obligatoire'] : [],
+                    courseId: !courseId ? ['Cours obligatoire'] : [],
+                    evaluation: !evaluation ? ['Évaluation obligatoire'] : []
+                }
+            };
+        }
+
+        const date = new Date();
+
+        await sql`
+            INSERT INTO progress (studentId, courseId, date, evaluation, comments)
+            VALUES (${studentId}, ${courseId}, ${date}, ${evaluation}, ${comments});
+        `;
+
+        revalidatePath('/teacher/evaluations');
+        return { message: 'success' };
+    } catch (error) {
+        console.error('Évaluation submission error:', error);
+        return { message: 'Une erreur est survenue lors de la soumission de l\'évaluation' };
+    }
+}
+
+export async function updateEvaluation(
+    id: string,
+    prevState: ProgressState,
+    formData: FormData
+): Promise<ProgressState> {
+    try {
+        const evaluation = formData.get('evaluation') as string;
+        const comments = formData.get('comments') as string;
+
+        if (!evaluation) {
+            return {
+                message: 'L\'évaluation est obligatoire',
+                errors: {
+                    evaluation: ['Évaluation obligatoire']
+                }
+            };
+        }
+
+        await sql`
+            UPDATE progress
+            SET evaluation = ${evaluation}, comments = ${comments}
+            WHERE id = ${id};
+        `;
+
+        revalidatePath('/teacher/evaluations');
+        return { message: 'success' };
+    } catch (error) {
+        console.error('Évaluation update error:', error);
+        return { message: 'Une erreur est survenue lors de la mise à jour de l\'évaluation' };
+    }
+}
+
+export async function deleteEvaluation(id: string) {
+    try {
+        await sql`DELETE FROM progress WHERE id = ${id}`;
+        revalidatePath('/teacher/evaluations');
+    } catch (error) {
+        console.error('Évaluation deletion error:', error);
+        throw new Error('Une erreur est survenue lors de la suppression de l\'évaluation');
+    }
+}

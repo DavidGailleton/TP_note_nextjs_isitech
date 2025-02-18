@@ -51,3 +51,21 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
     interface JWT extends Omit<BaseUser, "email" | "name"> {}
 }
+
+export type Progress = {
+    id: string;
+    studentId: string;
+    courseId: string;
+    date: Date;
+    evaluation: string;
+    comments: string;
+    studentname?: string;
+    coursename?: string;
+};
+
+export type Student = {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+};

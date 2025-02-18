@@ -14,6 +14,8 @@ const links = [
         role: ["teacher", "admin"],
     },
     { name: "Utilisateurs", href: "/admin/users", role: ["admin"] },
+    { name: "Mes cours", href: "/student/courses", role: ["student"] },
+    { name: "Mes progrès", href: "/student/progress", role: ["student"] },
 ];
 
 export default function NavLinks() {
