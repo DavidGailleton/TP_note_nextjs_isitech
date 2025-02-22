@@ -7,15 +7,18 @@ import { useSession } from "next-auth/react";
 
 const links = [
     { name: "Courses", href: "/teacher/courses", role: ["teacher", "admin"] },
-    { name: "Students", href: "/teacher/students", role: ["teacher", "admin"] },
     {
         name: "Evaluations",
         href: "/teacher/evaluations",
         role: ["teacher", "admin"],
     },
     { name: "Utilisateurs", href: "/admin/users", role: ["admin"] },
-    { name: "Mes cours", href: "/student/courses", role: ["student"] },
-    { name: "Mes progrès", href: "/student/progress", role: ["student"] },
+    { name: "Mes cours", href: "/student/courses", role: ["student", "admin"] },
+    {
+        name: "Mes progrès",
+        href: "/student/progress",
+        role: ["student", "admin"],
+    },
 ];
 
 export default function NavLinks() {

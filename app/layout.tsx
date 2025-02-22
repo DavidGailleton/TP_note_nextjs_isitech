@@ -1,10 +1,11 @@
 import AuthProvider from "@/app/lib/AuthProvider";
 import { auth } from "@/auth";
 import "@/app/ui/globals.css";
+import AuthRedirect from "@/app/lib/AuthRedirect";
 
 export const metadata = {
-    title: "Mon Application",
-    description: "Description de mon application",
+    title: "MusiLearn",
+    description: "Plateforme de gestion d'école de musique",
 };
 
 export default async function RootLayout({
@@ -17,7 +18,9 @@ export default async function RootLayout({
     return (
         <html lang="fr">
             <body>
-                <AuthProvider session={session}>{children}</AuthProvider>
+                <AuthProvider session={session}>
+                    <AuthRedirect>{children}</AuthRedirect>
+                </AuthProvider>
             </body>
         </html>
     );
